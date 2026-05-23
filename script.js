@@ -1,5 +1,3 @@
-// Add subtle interactivity
-
 document.addEventListener('DOMContentLoaded', () => {
     // Smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -34,35 +32,4 @@ document.addEventListener('DOMContentLoaded', () => {
             navbar.style.backgroundColor = 'rgba(250, 247, 242, 0.95)';
         }
     });
-
-    // Convert HEIC images on the fly
-    if (typeof heic2any !== 'undefined') {
-        const heicImages = document.querySelectorAll('img[src$=".HEIC"], img[src$=".heic"]');
-        heicImages.forEach(img => {
-            const originalSrc = img.src;
-            const fileName = originalSrc.split('/').pop();
-            const b64 = (typeof heicData !== 'undefined') ? (heicData[fileName] || heicData[decodeURIComponent(fileName)]) : null;
-            
-            if (b64) {
-                // Decode base64 to Uint8Array
-                const binaryString = window.atob(b64);
-                const len = binaryString.length;
-                const bytes = new Uint8Array(len);
-                for (let i = 0; i < len; i++) {
-                    bytes[i] = binaryString.charCodeAt(i);
-                }
-                const blob = new Blob([bytes], {type: 'image/heic'});
-                
-                heic2any({ blob, toType: 'image/jpeg', quality: 0.8 })
-                    .then(conversionResult => {
-                        const finalBlob = Array.isArray(conversionResult) ? conversionResult[0] : conversionResult;
-                        const url = URL.createObjectURL(finalBlob);
-                        img.src = url;
-                    })
-                    .catch(err => console.error("Error converting HEIC image: ", originalSrc, err));
-            } else {
-                console.warn("Base64 data not found for:", fileName);
-            }
-        });
-    }
 });
